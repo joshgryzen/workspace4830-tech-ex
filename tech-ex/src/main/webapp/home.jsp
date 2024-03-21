@@ -34,42 +34,88 @@ footer {
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
 <script>
-    $(document).ready(function() {
-        // Initialize DataTable
-        var table = $('#cardTable').DataTable();
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#cardTable').DataTable({
+        columnDefs: [{
+            targets: -1, // Target the last column (Quantity)
+            render: function(data, type, row, meta) {
+                // Render increment and decrement buttons
+                return '<button class="increment" data-row="' + meta.row + '">+</button>' +
+                    '<span>' + data + '</span>' +
+                    '<button class="decrement" data-row="' + meta.row + '">-</button>';
+            }
+        }]
+    });
 
-        // Make AJAX call to fetch data from servlet
+    // Make AJAX call to fetch data from servlet
+    $.ajax({
+        url: 'HomePageServlet', // Specify the URL of your servlet
+        method: 'POST', // Use POST method to send data
+        success: function(response) {
+            // Iterate over the retrieved cards and add them to the table
+            response.forEach(function(card) {
+                table.row.add([
+                    card.color,
+                    card.type,
+                    card.cmc,
+                    card.name,
+                    card.quantity
+                ]).draw();
+            });
+        },
+        error: function(xhr, status, error) {
+            // Handle errors
+            console.error(error);
+        }
+    });
+
+    // Handle click events for increment and decrement buttons
+    $('#cardTable tbody').on('click', 'button.increment', function() {
+        var rowIdx = $(this).data('row');
+        var rowData = table.row(rowIdx).data(); // Get the data of the row
+        var cardName = rowData[3]; // Assuming the card name is in the 4th column
+        var quantity = parseInt(table.cell(rowIdx, -1).data()) + 1; // Get current quantity and increment
+        table.cell(rowIdx, -1).data(quantity).draw();
+        updateQuantity(cardName, quantity);
+    });
+
+    $('#cardTable tbody').on('click', 'button.decrement', function() {
+        var rowIdx = $(this).data('row');
+        var rowData = table.row(rowIdx).data(); // Get the data of the row
+        var cardName = rowData[3]; // Assuming the card name is in the 4th column
+        var quantity = parseInt(table.cell(rowIdx, -1).data());
+        if (quantity > 0) {
+            quantity--; // Decrement only if quantity is greater than 0
+            table.cell(rowIdx, -1).data(quantity).draw();
+        }
+        updateQuantity(cardName, quantity);
+    });
+    
+    function updateQuantity(cardName, quantity) {
+    	console.log(cardName, quantity)
         $.ajax({
-            url: 'HomePageServlet', // Specify the URL of your servlet
-            method: 'POST', // Use POST method to send data
-            success: function(response) {
-                // Parse the JSON response from servlet
-                console.log(response);
-                // var cards = JSON.parse(response);
-                // console.log(cards);
-
-                // Iterate over the retrieved cards and add them to the table
-                response.forEach(function(card) {
-                    table.row.add([
-                        card.color,
-                        card.type,
-                        card.cmc,
-                        card.name,
-                        card.quantity
-                    ]).draw();
-                });
+            url: 'UpdateQuantityServlet', // URL of your servlet for updating quantity
+            method: 'POST',
+            data: {
+                cardName: cardName,
+                quantity: quantity
             },
-            error: function(xhr, status, error) {
+            success: function (response) {
+                // Handle success response if needed
+            },
+            error: function (xhr, status, error) {
                 // Handle errors
                 console.error(error);
             }
         });
-    });
-</script>
+    }
+
+});</script>
 </head>
 <body>
     <header>
-        <h1>All Cards</h1>
+        <h1>Card Library</h1>
     </header>
     <nav>
         <a href="/tech-ex/home.jsp">Home</a> <br>
