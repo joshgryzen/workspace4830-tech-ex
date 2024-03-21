@@ -37,17 +37,19 @@ footer {
 $(document).ready(function() {
     // Initialize DataTable
     var table = $('#cardTable').DataTable({
-        columnDefs: [{
-            targets: -1, // Target the last column (Quantity)
-            render: function(data, type, row, meta) {
-                // Render increment and decrement buttons
-                return '<button class="increment" data-row="' + meta.row + '">+</button>' +
-                    '<span>' + data + '</span>' +
-                    '<button class="decrement" data-row="' + meta.row + '">-</button>';
-            }
-        }]
-    });
-
+                columnDefs: [{
+                    targets: -1, // Target the last column (Quantity)
+                    render: function(data, type, row, meta) {
+                        // Render increment and decrement buttons and delete button
+                        return '<button class="increment" data-row="' + meta.row + '">+</button>' +
+                            '<span>' + data + '</span>' +
+                            '<button class="decrement" data-row="' + meta.row + '">-</button>' +
+                            '<button class="delete" data-row="' + meta.row + '">Delete</button>';
+                            
+                    }
+                }]
+            });
+    
     // Make AJAX call to fetch data from servlet
     $.ajax({
         url: 'HomePageServlet', // Specify the URL of your servlet
@@ -92,8 +94,32 @@ $(document).ready(function() {
         updateQuantity(cardName, quantity);
     });
     
+    $('#cardTable tbody').on('click', 'button.delete', function() {
+        var rowIdx = $(this).data('row');
+        var rowData = table.row(rowIdx).data();
+        var cardName = rowData[3]; // Assuming the card name is in the 4th column
+        deleteCard(cardName);
+        table.row($(this).parents('tr')).remove().draw(); // Remove the row from the DataTable
+    });
+
+    // Function to delete the card
+    function deleteCard(cardName) {
+        $.ajax({
+            url: 'DeleteCardServlet', // URL of your servlet for deleting a card
+            method: 'POST',
+            data: {
+                cardName: cardName
+            },
+            success: function(response) {
+                // Handle success response if needed
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
+    
     function updateQuantity(cardName, quantity) {
-    	console.log(cardName, quantity)
         $.ajax({
             url: 'UpdateQuantityServlet', // URL of your servlet for updating quantity
             method: 'POST',
