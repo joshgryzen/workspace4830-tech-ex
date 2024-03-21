@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/SimpleFormSearch")
-public class SimpleFormSearch extends HttpServlet {
+@WebServlet("/CardSearchServlet")
+public class CardSearchServlet extends HttpServlet {
    private static final long serialVersionUID = 1L;
 
-   public SimpleFormSearch() {
+   public CardSearchServlet() {
       super();
    }
 
@@ -27,7 +27,7 @@ public class SimpleFormSearch extends HttpServlet {
    void search(String keyword, HttpServletResponse response) throws IOException {
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
-      String title = "Database Result";
+      String title = "Card Database Result";
       String docType = "<!doctype html public \"-//w3c//dtd html 4.0 " + //
             "transitional//en\">\n"; //
       out.println(docType + //
@@ -43,27 +43,30 @@ public class SimpleFormSearch extends HttpServlet {
          connection = DBConnection.connection;
 
          if (keyword.isEmpty()) {
-            String selectSQL = "SELECT * FROM myTable";
+            String selectSQL = "SELECT * FROM cardTable";
             preparedStatement = connection.prepareStatement(selectSQL);
          } else {
-            String selectSQL = "SELECT * FROM myTable WHERE MYUSER LIKE ?";
-            String theUserName = keyword + "%";
+            String selectSQL = "SELECT * FROM cardTable WHERE color LIKE ? OR type LIKE ? OR cmc LIKE ? OR name LIKE ?";
+            String likeKeyword = "%" + keyword + "%";
             preparedStatement = connection.prepareStatement(selectSQL);
-            preparedStatement.setString(1, theUserName);
+            preparedStatement.setString(1, likeKeyword);
+            preparedStatement.setString(2, likeKeyword);
+            preparedStatement.setString(3, likeKeyword);
+            preparedStatement.setString(4, likeKeyword);
          }
          ResultSet rs = preparedStatement.executeQuery();
 
          while (rs.next()) {
-            int id = rs.getInt("id");
-            String userName = rs.getString("myuser").trim();
-            String email = rs.getString("email").trim();
-            String phone = rs.getString("phone").trim();
+            String color = rs.getString("color").trim();
+            String type = rs.getString("type").trim();
+            String cmc = rs.getString("cmc").trim();
+            String name = rs.getString("name").trim();
 
-            if (keyword.isEmpty() || userName.contains(keyword)) {
-               out.println("ID: " + id + ", ");
-               out.println("User: " + userName + ", ");
-               out.println("Email: " + email + ", ");
-               out.println("Phone: " + phone + "<br>");
+            if (keyword.isEmpty() || color.contains(keyword) || type.contains(keyword) || cmc.contains(keyword) || name.contains(keyword)) {
+               out.println("Color: " + color + ", ");
+               out.println("Type: " + type + ", ");
+               out.println("CMC: " + cmc + ", ");
+               out.println("Name: " + name + "<br>");
             }
          }
          out.println("<a href=/tech-ex/simpleFormSearch.html>Search Data</a> <br>");
@@ -93,5 +96,4 @@ public class SimpleFormSearch extends HttpServlet {
    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       doGet(request, response);
    }
-
 }

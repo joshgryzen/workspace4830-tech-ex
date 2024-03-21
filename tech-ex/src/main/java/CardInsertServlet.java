@@ -1,6 +1,5 @@
-
 /**
- * @file SimpleFormInsert.java
+ * @file CardInsertServlet.java
  */
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,29 +12,31 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/SimpleFormInsert")
-public class SimpleFormInsert extends HttpServlet {
+@WebServlet("/CardInsertServlet")
+public class CardInsertServlet extends HttpServlet {
    private static final long serialVersionUID = 1L;
 
-   public SimpleFormInsert() {
+   public CardInsertServlet() {
       super();
    }
 
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      String userName = request.getParameter("userName");
-      String email = request.getParameter("email");
-      String phone = request.getParameter("phone");
+      String color = request.getParameter("color");
+      String type = request.getParameter("type");
+      String cmc = request.getParameter("cmc");
+      String name = request.getParameter("name");
 
       Connection connection = null;
-      String insertSql = " INSERT INTO myTable (id, MYUSER, EMAIL, PHONE) values (default, ?, ?, ?)";
+      String insertSql = "INSERT INTO cardTable (color, type, cmc, name) VALUES (?, ?, ?, ?)";
 
       try {
          DBConnection.getDBConnection(getServletContext());
          connection = DBConnection.connection;
          PreparedStatement preparedStmt = connection.prepareStatement(insertSql);
-         preparedStmt.setString(1, userName);
-         preparedStmt.setString(2, email);
-         preparedStmt.setString(3, phone);
+         preparedStmt.setString(1, color);
+         preparedStmt.setString(2, type);
+         preparedStmt.setString(3, cmc);
+         preparedStmt.setString(4, name);
          preparedStmt.execute();
          connection.close();
       } catch (Exception e) {
@@ -45,7 +46,7 @@ public class SimpleFormInsert extends HttpServlet {
       // Set response content type
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
-      String title = "Insert Data to DB table";
+      String title = "Insert Card Data to DB";
       String docType = "<!doctype html public \"-//w3c//dtd html 4.0 " + "transitional//en\">\n";
       out.println(docType + //
             "<html>\n" + //
@@ -54,9 +55,10 @@ public class SimpleFormInsert extends HttpServlet {
             "<h2 align=\"center\">" + title + "</h2>\n" + //
             "<ul>\n" + //
 
-            "  <li><b>User Name</b>: " + userName + "\n" + //
-            "  <li><b>Email</b>: " + email + "\n" + //
-            "  <li><b>Phone</b>: " + phone + "\n" + //
+            "  <li><b>Color</b>: " + color + "\n" + //
+            "  <li><b>Type</b>: " + type + "\n" + //
+            "  <li><b>CMC</b>: " + cmc + "\n" + //
+            "  <li><b>Name</b>: " + name + "\n" + //
 
             "</ul>\n");
 
