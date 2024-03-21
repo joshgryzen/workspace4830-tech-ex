@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,15 +15,11 @@ public class HomePageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
+        response.setContentType("application/json");
+        // Set character encoding before writing response
+        response.setCharacterEncoding("UTF-8");
+
         PrintWriter out = response.getWriter();
-
-        out.println("<html><head><title>All Cards</title></head><body>");
-
-        out.println("<h2>All Cards</h2>");
-
-        out.println("<table border='1'>");
-        out.println("<tr><th>Color</th><th>Type</th><th>CMC</th><th>Name</th><th>Quantity</th></tr>");
 
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -37,6 +32,7 @@ public class HomePageServlet extends HttpServlet {
             preparedStatement = connection.prepareStatement(selectSQL);
             resultSet = preparedStatement.executeQuery();
 
+            StringBuilder jsonData = new StringBuilder("[");
             while (resultSet.next()) {
                 String color = resultSet.getString("color");
                 String type = resultSet.getString("type");
@@ -44,19 +40,20 @@ public class HomePageServlet extends HttpServlet {
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
                 
-                System.out.println(name);
-
-                out.println("<tr>");
-                out.println("<td>" + color + "</td>");
-                out.println("<td>" + type + "</td>");
-                out.println("<td>" + cmc + "</td>");
-                out.println("<td>" + name + "</td>");
-                out.println("<td>" + quantity + "</td>");
-                out.println("</tr>");
+                jsonData.append("{\"color\":\"").append(color).append("\",")
+                        .append("\"type\":\"").append(type).append("\",")
+                        .append("\"cmc\":").append(cmc).append(",")
+                        .append("\"name\":\"").append(name).append("\",")
+                        .append("\"quantity\":").append(quantity).append("},");
             }
-            out.println("</table>");
-            out.println("</body></html>");
-
+            if (jsonData.charAt(jsonData.length() - 1) == ',') {
+                jsonData.setCharAt(jsonData.length() - 1, ']'); // Replace last comma with ']'
+            } else {
+                jsonData.append("]");
+            }
+            System.out.println(jsonData.toString());
+            out.println(jsonData);
+            
         } catch (SQLException se) {
             se.printStackTrace();
         } catch (Exception e) {

@@ -1,4 +1,3 @@
-
 <html>
 <head>
 <style>
@@ -6,7 +5,7 @@ header {
     background-color:black;
     color:white;
     text-align:center;
-    padding:5px;	 
+    padding:5px;     
 }
 nav {
     line-height:30px;
@@ -14,62 +13,65 @@ nav {
     height:300px;
     width:100px;
     float:left;
-    padding:5px;	      
+    padding:5px;        
 }
+
 section {
-    width:350px;
-    float:left;
-    padding:10px;	 	 
+            float: left;
+            width: calc(100% - 120px); /* Subtracting the width of the sidebar (nav) */
+            padding: 5px;       
 }
+
 footer {
     background-color:black;
     color:white;
     clear:both;
     text-align:center;
-    padding:5px;	 	 
+    padding:5px;       
 }
 </style>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            var table = $('#cardTable').DataTable();
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        var table = $('#cardTable').DataTable();
 
-            // Make AJAX call to fetch data from servlet
-            $.ajax({
-                url: 'HomePageServlet', // Specify the URL of your servlet
-                method: 'POST', // Use POST method to send data
-                data: { action: 'getAllCards' }, // Provide any necessary data
-                success: function(response) {
-                    // Parse the JSON response from servlet
-                    var cards = JSON.parse(response);
+        // Make AJAX call to fetch data from servlet
+        $.ajax({
+            url: 'HomePageServlet', // Specify the URL of your servlet
+            method: 'POST', // Use POST method to send data
+            success: function(response) {
+                // Parse the JSON response from servlet
+                console.log(response);
+                // var cards = JSON.parse(response);
+                // console.log(cards);
 
-                    // Iterate over the retrieved cards and add them to the table
-                    $.each(cards, function(index, card) {
-                        table.row.add([
-                            card.color,
-                            card.type,
-                            card.cmc,
-                            card.name,
-                            card.quantity
-                        ]).draw();
-                    });
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors
-                    console.error(error);
-                }
-            });
+                // Iterate over the retrieved cards and add them to the table
+                response.forEach(function(card) {
+                    table.row.add([
+                        card.color,
+                        card.type,
+                        card.cmc,
+                        card.name,
+                        card.quantity
+                    ]).draw();
+                });
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.error(error);
+            }
         });
-    </script>
+    });
+</script>
 </head>
 <body>
-	<header>
-		<h1>All Cards</h1>
-	</header>
-	<nav>
+    <header>
+        <h1>All Cards</h1>
+    </header>
+    <nav>
         <a href="/tech-ex/home.jsp">Home</a> <br>
         <a href="/tech-ex/simpleFormSearch.html">Card Search</a> <br>
         <a href="/tech-ex/simpleFormInsert.html">Insert Cards</a> <br>
@@ -86,10 +88,12 @@ footer {
             </tr>
         </thead>
         <tbody>
-            <!-- Your servlet will populate the table rows dynamically -->
+            <!-- Table body will be populated dynamically -->
         </tbody>
     </table>
     </section>
-    
+<footer>
+Josh Gryzen Tech Exercise
+</footer>
 </body>
 </html>
