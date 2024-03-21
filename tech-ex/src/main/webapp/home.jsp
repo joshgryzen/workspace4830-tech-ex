@@ -17,9 +17,9 @@ nav {
 }
 
 section {
-            float: left;
-            width: calc(100% - 120px); /* Subtracting the width of the sidebar (nav) */
-            padding: 5px;       
+    float: left;
+    width: calc(100% - 120px); /* Subtracting the width of the sidebar (nav) */
+    padding: 5px;       
 }
 
 footer {

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,20 +28,38 @@ public class CardInsertServlet extends HttpServlet {
       String name = request.getParameter("name");
 
       Connection connection = null;
-      String insertSql = "INSERT INTO cardTable (color, type, cmc, name) VALUES (?, ?, ?, ?)";
+      
+      String selectSQL = "SELECT quantity FROM cardTable WHERE name = ?";
+      String updateSQL = "UPDATE cardTable SET quantity = quantity + 1 WHERE name = ?";
+      String insertSql = "INSERT INTO cardTable (color, type, cmc, name, quantity) VALUES (?, ?, ?, ?, 1)";
 
       try {
-         DBConnection.getDBConnection(getServletContext());
-         connection = DBConnection.connection;
-         PreparedStatement preparedStmt = connection.prepareStatement(insertSql);
-         preparedStmt.setString(1, color);
-         preparedStmt.setString(2, type);
-         preparedStmt.setString(3, cmc);
-         preparedStmt.setString(4, name);
-         preparedStmt.execute();
-         connection.close();
+          DBConnection.getDBConnection(getServletContext());
+          connection = DBConnection.connection;
+          
+          // Check if the card already exists in the database
+          PreparedStatement selectStmt = connection.prepareStatement(selectSQL);
+          selectStmt.setString(1, name);
+          ResultSet resultSet = selectStmt.executeQuery();
+
+          if (resultSet.next()) {
+              // Card already exists, so increment the quantity
+              PreparedStatement updateStmt = connection.prepareStatement(updateSQL);
+              updateStmt.setString(1, name);
+              updateStmt.executeUpdate();
+          } else {
+              // Card doesn't exist, so insert a new row
+              PreparedStatement insertStmt = connection.prepareStatement(insertSql);
+              insertStmt.setString(1, color);
+              insertStmt.setString(2, type);
+              insertStmt.setString(3, cmc);
+              insertStmt.setString(4, name);
+              insertStmt.executeUpdate();
+          }
+          
+          connection.close();
       } catch (Exception e) {
-         e.printStackTrace();
+          e.printStackTrace();
       }
 
       // Set response content type
