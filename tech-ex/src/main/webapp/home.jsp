@@ -78,7 +78,7 @@ $(document).ready(function() {
         var rowData = table.row(rowIdx).data(); // Get the data of the row
         var cardName = rowData[3]; // Assuming the card name is in the 4th column
         var quantity = parseInt(table.cell(rowIdx, -1).data()) + 1; // Get current quantity and increment
-        table.cell(rowIdx, -1).data(quantity).draw();
+        table.cell(rowIdx, -1).data(quantity).draw(false);
         updateQuantity(cardName, quantity);
     });
 
@@ -89,7 +89,7 @@ $(document).ready(function() {
         var quantity = parseInt(table.cell(rowIdx, -1).data());
         if (quantity > 0) {
             quantity--; // Decrement only if quantity is greater than 0
-            table.cell(rowIdx, -1).data(quantity).draw();
+            table.cell(rowIdx, -1).data(quantity).draw(false);
         }
         updateQuantity(cardName, quantity);
     });
@@ -99,7 +99,7 @@ $(document).ready(function() {
         var rowData = table.row(rowIdx).data();
         var cardName = rowData[3]; // Assuming the card name is in the 4th column
         deleteCard(cardName);
-        table.row($(this).parents('tr')).remove().draw(); // Remove the row from the DataTable
+        table.row($(this).parents('tr')).remove().draw(false); // Remove the row from the DataTable
     });
 
     // Function to delete the card
