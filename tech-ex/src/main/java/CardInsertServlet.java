@@ -62,7 +62,7 @@ public class CardInsertServlet extends HttpServlet {
 
             "</ul>\n");
 
-      out.println("<a href=/tech-ex/simpleFormSearch.html>Search Data</a> <br>");
+      out.println("<a href=/tech-ex/home.jsp>Return Home</a> <br>");
       out.println("</body></html>");
    }
 

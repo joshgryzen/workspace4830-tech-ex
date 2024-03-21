@@ -61,7 +61,7 @@ public class CardInsertMultipleServlet extends HttpServlet {
             "<h2 align=\"center\">" + title + "</h2>\n" + //
             "<p>Successfully inserted cards</p>\n");
 
-      out.println("<a href=/tech-ex/simpleFormSearch.html>Search Data</a> <br>");
+      out.println("<a href=/tech-ex/home.jsp>Return Home</a> <br>");
       out.println("</body></html>");
    }
 

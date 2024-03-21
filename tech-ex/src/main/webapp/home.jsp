@@ -73,8 +73,7 @@ footer {
     </header>
     <nav>
         <a href="/tech-ex/home.jsp">Home</a> <br>
-        <a href="/tech-ex/simpleFormSearch.html">Card Search</a> <br>
-        <a href="/tech-ex/simpleFormInsert.html">Insert Cards</a> <br>
+		<a href="/tech-ex/insert.html">Insert Cards</a> <br>
     </nav>
     <section>
     <table id="cardTable" class="display">
