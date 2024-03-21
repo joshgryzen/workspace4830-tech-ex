@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -92,8 +94,122 @@ public class CardSearchServlet extends HttpServlet {
          }
       }
    }
-
+   
    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      doGet(request, response);
+       String action = request.getParameter("action");
+       if (action == null) {
+           // Default action when no action parameter is provided
+    	   doGet(request, response);       }
+
+       else if ("getAllCards".equals(action)) {
+           List<Card> cards = getAllCardsFromDatabase(); // Retrieve all cards from the database
+
+           // Set cards as request attribute
+           request.setAttribute("cards", cards);
+
+           // Forward to home.jsp
+           request.getRequestDispatcher("home.jsp").forward(request, response);
+       }
    }
+
+// Method to retrieve all cards from the database
+   List<Card> getAllCardsFromDatabase() {
+	   	  List<Card> cards = new ArrayList<>();
+	      Connection connection = null;
+	      PreparedStatement preparedStatement = null;
+	      try {
+	         DBConnection.getDBConnection(getServletContext());
+	         connection = DBConnection.connection;
+             String selectSQL = "SELECT * FROM cardTable";
+             preparedStatement = connection.prepareStatement(selectSQL);
+	         ResultSet rs = preparedStatement.executeQuery();
+
+	         while (rs.next()) {
+	            String color = rs.getString("color").trim();
+	            String type = rs.getString("type").trim();
+	            int cmc = rs.getInt("cmc");
+	            String name = rs.getString("name").trim();
+	            int quantity = rs.getInt("quantity");
+	            
+	            Card card = new Card(color, type, cmc, name, quantity);
+	            cards.add(card);
+
+	         }
+	         rs.close();
+	         preparedStatement.close();
+	         connection.close();
+	      } catch (SQLException se) {
+	         se.printStackTrace();
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            if (preparedStatement != null)
+	               preparedStatement.close();
+	         } catch (SQLException se2) {
+	         }
+	         try {
+	            if (connection != null)
+	               connection.close();
+	         } catch (SQLException se) {
+	            se.printStackTrace();
+	         }
+	      }
+	      System.out.println(cards);
+	      return cards;
+	   }
 }
+   
+//// Method to retrieve all cards from the database
+//   public List<Card> getAllCardsFromDatabase() {
+//       List<Card> cards = new ArrayList<>();
+//       Connection connection = null;
+//       PreparedStatement statement = null;
+//       ResultSet resultSet = null;
+//
+//       try {
+//           // Establish database connection
+//    	   DBConnection.getDBConnection(getServletContext());
+//           connection = DBConnection.connection;
+//
+//           // Prepare SQL query to select all cards from the cardTable
+//           String query = "SELECT color, type, cmc, name, quantity FROM cardTable";
+//           statement = connection.prepareStatement(query);
+//
+//           // Execute query
+//           resultSet = statement.executeQuery();
+//
+//           // Process result set and populate cards list
+//           while (resultSet.next()) {
+//               String color = resultSet.getString("color");
+//               String type = resultSet.getString("type");
+//               int cmc = resultSet.getInt("cmc");
+//               String name = resultSet.getString("name");
+//               int quantity = resultSet.getInt("quantity");
+//
+//               // Create a new Card object and add it to the list
+//               Card card = new Card(color, type, cmc, name, quantity);
+//               cards.add(card);
+//           }
+//       } catch (SQLException e) {
+//           e.printStackTrace();
+//       } finally {
+//           // Close JDBC resources
+//           try {
+//               if (resultSet != null) {
+//                   resultSet.close();
+//               }
+//               if (statement != null) {
+//                   statement.close();
+//               }
+//               if (connection != null) {
+//                   connection.close();
+//               }
+//           } catch (SQLException e) {
+//               e.printStackTrace();
+//           }
+//       }
+//       System.out.println(cards);
+//       return cards;
+//   }
+//}
