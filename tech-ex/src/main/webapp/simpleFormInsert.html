@@ -40,7 +40,7 @@ footer {
 </nav>
 
 <section>
-	<h1>User Input</h1>
+	<h1>Single Card Insert</h1>
 	
 	<form action="CardInsertServlet" method="POST">
 	
@@ -51,6 +51,12 @@ footer {
 		
 		<input type="submit" value="Submit" />
 	</form>
+	
+	<h2>Insert Multiple Cards</h2>
+    <form action="CardInsertMultipleServlet" method="post">
+        <textarea name="cardList" rows="5" cols="50" placeholder="Enter cards (color, type, cmc, name) separated by new lines"></textarea><br>
+        <input type="submit" value="Submit">
+    </form>
 
 </section>
 
